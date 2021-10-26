@@ -269,8 +269,19 @@ int push_one_command (Commands* com, char_mas* array, int* tmp_com)
     //printf("--%s--\n", com[*tmp_com].command);
     if (strlen(com[*tmp_com].command) == 0)
         return 0;
+
     #include "C:/VSC progs/Processor/define.define"
-    /*
+
+    else
+    {  
+        printf("INCORRECT!!!\n");
+        bait.cmd = INCORRECT_INPUT;    
+        *((Cmd*)(array->mas + array->ip)) = bait;
+        array->ip += 1; // sizeof(bait)
+    }
+    return 0;
+}
+/*
     else if (strcmp(com[*tmp_com].command, "PUSH") == 0)
     {
         
@@ -465,12 +476,3 @@ int push_one_command (Commands* com, char_mas* array, int* tmp_com)
         array->ip += 1; // sizeof(bait)
     }
     */
-    else
-    {  
-        printf("INCORRECT!!!\n");
-        bait.cmd = INCORRECT_INPUT;    
-        *((Cmd*)(array->mas + array->ip)) = bait;
-        array->ip += 1; // sizeof(bait)
-    }
-    return 0;
-}
