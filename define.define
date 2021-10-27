@@ -1,7 +1,7 @@
-DEF_CMD(17, PUSH, 1, 
+DEF_CMD(16, PUSH, 1, 
 StackPush(stk, buf->data[buf->tmp_elem]);)
 
-DEF_CMD(2, POP, 1,  
+DEF_CMD(15, POP, 1,  
 StackPop(stk);)
 
 DEF_CMD(3, MUL, 0,  

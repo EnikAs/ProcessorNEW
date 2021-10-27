@@ -1,7 +1,7 @@
 #include "asm.h"
 
-FILE* calc_file = fopen("calc.txt", "r");
-FILE* assembler_file = fopen("assembler.jopa", "wb");
+FILE* calc_file = fopen("C:/VSCprogs/Processor/calc.txt", "r");
+FILE* assembler_file = fopen("C:/VSCprogs/Processor/assembler.jopa", "wb");
 
 int print_all_commands (FILE* file_stream)
 {
@@ -59,7 +59,7 @@ size_t scanf_file_size (FILE* input_file)
         return EOF;
     }
 
-    printf("govno %d govno\n", file.st_size);
+    //printf("govno %d govno\n", file.st_size);
     return file.st_size;
 }
 
@@ -139,7 +139,7 @@ int get_one_command (Commands* com, buffer* buf)
     //printf("->%d<-\n", com[buf->tmp_string_cunt].lenght);
     if (com[buf->tmp_string_cunt].lenght > 0)
     {
-        printf("|%s|\n", com[buf->tmp_string_cunt].command);
+        //printf("|%s|\n", com[buf->tmp_string_cunt].command);
         buf->tmp_string_cunt++;
     }
     
@@ -159,22 +159,6 @@ int get_one_command (Commands* com, buffer* buf)
     return -1;
 }
 
-elem_t get_int_from_com (Commands com)
-{
-    elem_t tmp_int = 0;
-    for(int i = 0 ; i < com.lenght ; i++)
-    {
-        if (com.command[i] <= '9' && com.command[i] >= '0')
-        {
-            tmp_int *= 10;
-            tmp_int += com.command[i] - '0';
-        }
-        else 
-            printf("PROEBALI");
-            //assert(ERROR && "INCORRECT INPUT!!");
-    }
-    return tmp_int;
-}
 
 #undef DEF_CMD
 
@@ -204,15 +188,15 @@ else if (strcmp(com[*tmp_com].command, #name) == 0)                             
             }                                                                                  \
             else if (sscanf(com[*tmp_com].command, "[%cx%c", &tmp_reg, &skobka) == 2)          \
             {                                                                                  \
-                if (skobka == ']')                                                             \
-                {                                                                              \
+                printf("povezlo");if (skobka == ']')                                                             \
+                {printf("povezlo");                                                                              \
                 bait.ram = 1;                                                                  \
                 bait.reg = 1;                                                                  \
                 bait.cmd = name;                                                               \
                 }                                                                              \
                 else                                                                           \
                     return INCORRECT_INPUT;                                                    \
-                *((Cmd*)(char*)array->mas + array->ip) = bait;                                 \
+                *((Cmd*)((char*)array->mas + array->ip)) = bait;                               \
                 array->ip += 1;                                                                \
                 *((char*)((char*)array->mas + array->ip)) = tmp_reg - 'a';                     \
                 array->ip += 1;                                                                \
@@ -245,7 +229,6 @@ else if (strcmp(com[*tmp_com].command, #name) == 0)                             
             {                                                                                  \
                 bait.konst = 1;                                                                \
                 bait.cmd = name;                                                               \
-                printf("int = %d\n", tmp_int);                                                 \
                 *((Cmd*)(array->mas + array->ip)) = bait;                                      \
                 array->ip += 1;                                                                \
                 *((int*)(array->mas + array->ip)) = tmp_int;                                   \
@@ -270,7 +253,7 @@ int push_one_command (Commands* com, char_mas* array, int* tmp_com)
     if (strlen(com[*tmp_com].command) == 0)
         return 0;
 
-    #include "C:/VSC progs/Processor/define.define"
+    #include "C:/VSCprogs/Processor/define.define"
 
     else
     {  

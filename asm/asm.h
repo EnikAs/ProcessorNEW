@@ -1,5 +1,5 @@
-#ifndef ASSEMBLER_H_INCLUDED
-#define ASSEMBLER_H_INCLUDED
+#ifndef ASM_H_INCLUDED
+#define ASM_H_INCLUDED
 
 #include <iostream>
 #include <iostream>
@@ -11,8 +11,8 @@
 #include <sys\stat.h>
 
 
-#include "C:/VSC progs/Processor/stackfunc.h"
-#include "C:/VSC progs/Processor/cmd-enum.h"
+#include "C:/VSCprogs/Processor/stackfunc.h"
+#include "C:/VSCprogs/Processor/cmd-enum.h"
 
 
 typedef int elem_t;
@@ -40,7 +40,7 @@ struct Cmd
     unsigned ram : 1;
     unsigned reg : 1;
     unsigned konst : 1;
-    int cmd : 5;
+    unsigned cmd : 5;
 };
 
 struct buffer 
@@ -52,8 +52,6 @@ struct buffer
     int buffer_size = 0;
     int tmp_pos = 0;
 };
-
-elem_t       get_int_from_com           (Commands com);
 
 size_t       scanf_file_size            (FILE* file_stream);
 
