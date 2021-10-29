@@ -3,7 +3,8 @@
 
 #define DEF_CMD(num, name, ...)     \
 name = num,     
-     
+
+typedef int cpu_val;     
 
 enum commands
 {

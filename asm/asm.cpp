@@ -2,6 +2,7 @@
 
 FILE* calc_file = fopen("C:/VSCprogs/Processor/calc.txt", "r");
 FILE* assembler_file = fopen("C:/VSCprogs/Processor/assembler.jopa", "wb");
+int tags[10] = {};
 
 int print_all_commands (FILE* file_stream)
 {
@@ -35,6 +36,12 @@ int print_all_commands (FILE* file_stream)
 
     int tmp_com = 0;
     
+    for (tmp_com = 0 ; tmp_com < buf->tmp_string_cunt ; tmp_com++)
+    {
+        push_one_command(com, &array, &tmp_com);
+    }
+    tmp_com = 0;
+    array = {};
     for (tmp_com = 0 ; tmp_com < buf->tmp_string_cunt ; tmp_com++)
     {
         push_one_command(com, &array, &tmp_com);
@@ -129,17 +136,11 @@ int get_all_commands (Commands* com, buffer* buf)
 
 int get_one_command (Commands* com, buffer* buf)
 {
-    
-    //printf("%d\n", buf->tmp_string_cunt);
-    //printf("%s", buf->buffer);
-    
     com[buf->tmp_string_cunt].command = ((char*)buf->buffer + buf->tmp_pos);
-    //printf("|%s|\n", com[buf->tmp_string_cunt].command);
     com[buf->tmp_string_cunt].lenght = strlen(com[buf->tmp_string_cunt].command);
-    //printf("->%d<-\n", com[buf->tmp_string_cunt].lenght);
+
     if (com[buf->tmp_string_cunt].lenght > 0)
     {
-        //printf("|%s|\n", com[buf->tmp_string_cunt].command);
         buf->tmp_string_cunt++;
     }
     
@@ -188,8 +189,8 @@ else if (strcmp(com[*tmp_com].command, #name) == 0)                             
             }                                                                                  \
             else if (sscanf(com[*tmp_com].command, "[%cx%c", &tmp_reg, &skobka) == 2)          \
             {                                                                                  \
-                printf("povezlo");if (skobka == ']')                                                             \
-                {printf("povezlo");                                                                              \
+                if (skobka == ']')                                                             \
+                {                                                                             \
                 bait.ram = 1;                                                                  \
                 bait.reg = 1;                                                                  \
                 bait.cmd = name;                                                               \
@@ -234,6 +235,15 @@ else if (strcmp(com[*tmp_com].command, #name) == 0)                             
                 *((int*)(array->mas + array->ip)) = tmp_int;                                   \
                 array->ip += 4;                                                                \
             }                                                                                  \
+            else if(sscanf(com[*tmp_com].command, ":%d", &tmp_tag) == 1)                        \
+            {                                                                                  \
+                bait.konst = 1;                                                                \
+                bait.cmd = name;                                                               \
+                *((Cmd*)(array->mas + array->ip)) = bait;                                      \
+                array->ip += 1;                                                                \
+                *((int*)(array->mas + array->ip)) = tags[tmp_tag];                                   \
+                array->ip += 4;                                                                \
+            }                                                                                  \
         }                                                                                      \
         else                                                                                   \
         {                                                                                      \
@@ -247,17 +257,22 @@ int push_one_command (Commands* com, char_mas* array, int* tmp_com)
 {
     Cmd bait = {};
     int tmp_int = 0; 
+    int tmp_tag = -1;
     char tmp_reg = 0;
     char skobka = 0;
-    //printf("--%s--\n", com[*tmp_com].command);
     if (strlen(com[*tmp_com].command) == 0)
         return 0;
+
+    else if (sscanf(com[*tmp_com].command, "::%d", &tmp_tag ) == 1)
+    {
+        if (tags[tmp_tag] == 0)
+            tags[tmp_tag] = array->ip;
+    }
 
     #include "C:/VSCprogs/Processor/define.define"
 
     else
     {  
-        printf("INCORRECT!!!\n");
         bait.cmd = INCORRECT_INPUT;    
         *((Cmd*)(array->mas + array->ip)) = bait;
         array->ip += 1; // sizeof(bait)

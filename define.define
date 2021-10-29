@@ -1,26 +1,142 @@
 DEF_CMD(16, PUSH, 1, 
-StackPush(stk, buf->data[buf->tmp_elem]);)
+if (cmd.reg == 1)
+        {
+            tmp_reg = *((char*)(cpu->data + cpu->ip));
+            cpu->ip += 1;
+            if (cmd.konst == 1)
+            {
+                tmp_int = *((cpu_val*)(cpu->data + cpu->ip));
+                cpu->ip += sizeof(cpu_val);
+
+                if (cmd.ram == 1)
+                {
+                    sleep(1);
+                    tmp_ram = cpu->ram[tmp_int + cpu->reg[tmp_reg]];
+                    StackPush(&cpu->stk, tmp_ram);
+                    return CORRECT;
+                }
+
+                StackPush(&cpu->stk, tmp_int + cpu->reg[tmp_reg]);
+                return CORRECT;
+            }
+
+            else if (cmd.ram == 1)
+            {
+                sleep(1);
+                tmp_ram = cpu->ram[cpu->reg[tmp_reg]];
+                StackPush(&cpu->stk, tmp_ram);
+                return CORRECT;
+            }
+
+            StackPush(&cpu->stk, cpu->reg[tmp_reg]);
+            return CORRECT;
+        }
+
+        tmp_int = *((cpu_val*)(cpu->data + cpu->ip));
+        cpu->ip += sizeof(cpu_val);
+
+        if (cmd.ram == 1)
+        {   
+            sleep(1);
+            tmp_ram = cpu->ram[tmp_int];
+            StackPush(&cpu->stk, tmp_ram);
+
+            return CORRECT;
+        }
+        StackPush(&cpu->stk, tmp_int);
+        return CORRECT;)
 
 DEF_CMD(15, POP, 1,  
-StackPop(stk);)
+if (cmd.reg == 1)
+        {
+            tmp_reg = *((char*)(cpu->data + cpu->ip));
+            cpu->ip += 1;
+            if (cmd.konst == 1)
+            {
+                tmp_int = *((cpu_val*)(cpu->data + cpu->ip));
+                cpu->ip += sizeof(cpu_val);
+
+                if (cmd.ram == 1)
+                {
+                    sleep(1);
+                    cpu->ram[tmp_int + cpu->reg[tmp_reg]] = StackPop(&cpu->stk);
+
+                    return CORRECT;
+                }
+
+                return INCORRECT_INPUT;
+            }
+
+            else if (cmd.ram == 1)
+            {
+                sleep(1);
+                cpu->ram[cpu->reg[tmp_reg]] = StackPop(&cpu->stk);
+                
+                return CORRECT;
+            }
+
+            cpu->reg[tmp_reg] = StackPop(&cpu->stk);    
+            return CORRECT;
+        }
+
+        tmp_int = *((cpu_val*)(cpu->data + cpu->ip));
+        cpu->ip += sizeof(cpu_val);
+
+        if (cmd.ram == 1)
+        {   
+            sleep(1);
+            cpu->ram[tmp_int] = StackPop(&cpu->stk);
+
+            return CORRECT;
+        }
+        
+        return INCORRECT_INPUT;)
 
 DEF_CMD(3, MUL, 0,  
-StackPush(stk, StackPop(stk) * StackPop(stk));)
+StackPush(&cpu->stk, StackPop(&cpu->stk) * StackPop(&cpu->stk));)
 
 DEF_CMD(4, DIV, 0,  
-StackPush(stk, StackPop(stk) / StackPop(stk));)
+StackPush(&cpu->stk, StackPop(&cpu->stk) / StackPop(&cpu->stk));)
 
 DEF_CMD(5, SUB, 0,  
-StackPush(stk, StackPop(stk) - StackPop(stk));)
+StackPush(&cpu->stk, StackPop(&cpu->stk) - StackPop(&cpu->stk));)
 
-DEF_CMD(6, AFF, 0,  
-StackPush(stk, StackPop(stk) + StackPop(stk));)
+DEF_CMD(6, ADD, 0,  
+StackPush(&cpu->stk, StackPop(&cpu->stk) + StackPop(&cpu->stk));)
 
 DEF_CMD(7, OUT, 0,  
-StackDtor(stk);)
+StackDtor(&cpu->stk);)
 
 DEF_CMD(9, IN, 0, 
-int a = 0;scanf("%d", &a);StackPush(stk, a);)
+cpu_val a = 0;scanf("%d", &a);StackPush(&cpu->stk, a);)
+
+DEF_CMD(10, JMP, 1, 
+tmp_int = *((cpu_val*)(cpu->data + cpu->ip));
+cpu->ip += sizeof(cpu_val);
+cpu->ip = tmp_int;
+return CORRECT;)
+
+DEF_CMD(11, PRCH, 0, 
+int a = 0 ;
+a = StackPop(&cpu->stk);
+printf("->%d<-\n", a);
+return CORRECT;)
+
+DEF_CMD(12, CALL, 1, 
+tmp_int = *((cpu_val*)(cpu->data + cpu->ip));
+cpu->ip += sizeof(cpu_val);
+StackPush(&cpu->stk, cpu->ip);
+cpu->ip = tmp_int;
+return CORRECT;)
+
+DEF_CMD(13, RET, 0, 
+int a = 0;
+a = StackPop(&cpu->stk);
+cpu->ip = a;
+return CORRECT;)
+
+DEF_CMD(14, HLT, 0, 
+return END_OF_PROG;)
 
 DEF_CMD(8, INCORRECT_INPUT, 0,  
 return INCORRECT_INPUT;)

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <cassert>
 #include <sys\stat.h>
+#include <unistd.h>
 
 #include "stackfunc.h"
 //#include "C:/VSC progs/Processor/stackfunc.cpp"
@@ -18,6 +19,10 @@ const int RAM_SIZE = 10000;
 const int VRAM_SIZE = 10000;
 const int REG_CUNT = 4;
 
+enum for_end
+{
+    END_OF_PROG = 1488
+};
 struct CPU 
 {
     Stack stk = {};
@@ -44,6 +49,8 @@ struct Cmd
     unsigned konst : 1;
     unsigned cmd : 5;
 };
+
+void cpu_dump(CPU *cpu);
 
 int get_file_stat (FILE* input_file);
 

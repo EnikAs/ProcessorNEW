@@ -37,8 +37,7 @@ int init_one_command (CPU* cpu)
 {
     Cmd cmd = {};
     cmd = *((Cmd*)(cpu->data + cpu->ip));
-    printf("|%u|\t|%u|\t|%u|\t|%d|\n", cmd.ram, cmd.reg, cmd.konst, cmd.cmd);
-   // printf("hui->%d<-\n", (char)cmd);
+    //printf("|%u|\t|%u|\t|%u|\t|%d|\n\n", cmd.ram, cmd.reg, cmd.konst, cmd.cmd);
     switch((int)cmd.cmd)
     {
         #include "C:/VSCprogs/Processor/define.define"
@@ -51,29 +50,84 @@ int init_one_command (CPU* cpu)
     else if(command == name)            \
     {                                   \
         code                            \
-        buf->tmp_elem += arg;           \
     }                                   \
 
 int do_one_command (CPU* cpu)
 {
     int tmp_int = 0;
     int tmp_reg = 0;
+    int tmp_ram = 0;
     int command = init_one_command(cpu);
 
     Cmd cmd = {};
     cmd = *((Cmd*)(cpu->data + cpu->ip));
     cpu->ip += 1;
+
+    //cpu_dump(cpu);
+    //getchar();
     if(0);
 
-    //#include "C:/VSC progs/Processor/define.define"
+    #include "C:/VSCprogs/Processor/define.define"
     
+    else
+    {
+        printf ("INCORRECT INPUT TOBI PIZDA!!!");
+        return INCORRECT_INPUT;
+    }
+    return CORRECT;
+    }
+
+void cpu_dump(CPU *cpu)
+{
+	
+	assert(cpu);
+	
+	//fprintf(file, "\n\n\n\n**********CPU CODE DUMP**********\n\n");
+	int size = cpu->data_size;
+	if (cpu->data_size > 255)
+		size = 255;
+
+	for (int i = 0; i!= size; i++) {
+		printf("%02d ", i);
+	}
+
+	printf("\n");
+
+	for (int i = 0; i != size; i++) {
+		printf("%02x ", (unsigned char)cpu->data[i]);
+	}
+
+	printf("\n");
+	printf("%*s\n", cpu->ip * 3 - 2, "^");
+
+    getchar();
+	//sleep(3);
+}
+    
+
+
+
+int do_all_commands (FILE* input_file, CPU* cpu)
+{
+    StackCtor(&cpu->stk, 10);
+    get_commands_from_asm(input_file, cpu); 
+    int correct_check = -1;
+    while (cpu->ip < cpu->data_size)
+    {
+        correct_check = do_one_command(cpu);
+        if (correct_check == INCORRECT_INPUT)
+            return INCORRECT_INPUT;
+        if (correct_check == END_OF_PROG)
+            return END_OF_PROG;
+    }
+    return CORRECT;
+}
+/*
     else if (command == PUSH)
     {
-        printf ("I AM IN PUSH\n");
         if (cmd.reg == 1)
         {
             tmp_reg = *((char*)(cpu->data + cpu->ip));
-            printf("tmp_reg ->%d<-\n", tmp_reg);
             cpu->ip += 1;
             if (cmd.konst == 1)
             {
@@ -82,38 +136,45 @@ int do_one_command (CPU* cpu)
 
                 if (cmd.ram == 1)
                 {
-                    cpu->ram[cpu->ram_ip] = tmp_int + cpu->reg[tmp_reg];
-                    cpu->ram_ip += 1;
-                    return 0;
+                    tmp_ram = cpu->ram[tmp_int + cpu->reg[tmp_reg]];
+                    StackPush(&cpu->stk, tmp_ram);
+                    return CORRECT;
                 }
 
                 StackPush(&cpu->stk, tmp_int + cpu->reg[tmp_reg]);
-                return 0;
+                return CORRECT;
             }
+
+            else if (cmd.ram == 1)
+            {
+                tmp_ram = cpu->ram[cpu->reg[tmp_reg]];
+                StackPush(&cpu->stk, tmp_ram);
+                return CORRECT;
+            }
+
             StackPush(&cpu->stk, cpu->reg[tmp_reg]);
-            return 0;
+            return CORRECT;
         }
+
         tmp_int = *((int*)(cpu->data + cpu->ip));
         cpu->ip += 4;
+
         if (cmd.ram == 1)
         {   
-            cpu->ram_ip += 1;
-            cpu->ram[cpu->ram_ip] = tmp_int;
+            tmp_ram = cpu->ram[tmp_int];
+            StackPush(&cpu->stk, tmp_ram);
 
-            return 0;
+            return CORRECT;
         }
-        printf ("I AM GONNA PUSH!!!\n");
         StackPush(&cpu->stk, tmp_int);
-        return 0;
+        return CORRECT;
     }
 
     else if (command == POP)
     {
-        printf ("I AM IN POP\n");
         if (cmd.reg == 1)
         {
             tmp_reg = *((char*)(cpu->data + cpu->ip));
-            printf("tmp_reg ->%d<-\n", tmp_reg);
             cpu->ip += 1;
             if (cmd.konst == 1)
             {
@@ -122,36 +183,38 @@ int do_one_command (CPU* cpu)
 
                 if (cmd.ram == 1)
                 {
-                    cpu->reg[tmp_reg] = tmp_int + cpu->ram[cpu->ram_ip];
-                    cpu->ram[cpu->ram_ip] = 0;
-                    cpu->ram_ip -= 1;
-                    return 0;
+                    cpu->ram[tmp_int + cpu->reg[tmp_reg]] = StackPop(&cpu->stk);
+
+                    return CORRECT;
                 }
 
-                cpu->reg[tmp_reg] = StackPop(&cpu->stk) + tmp_int;
-                return 0;
+                return INCORRECT_INPUT;
             }
-            if (cmd.ram == 1)
-                {
-                    cpu->reg[tmp_reg] = cpu->ram[cpu->ram_ip];
-                    cpu->ram[cpu->ram_ip] = 0;
-                    cpu->ram_ip -= 1;
-                    assert(cpu->ram_ip >= 0);
-                    return 0;
-                }
-            cpu->reg[tmp_reg] = StackPop(&cpu->stk);
-            return 0;
+
+            else if (cmd.ram == 1)
+            {
+                cpu->ram[cpu->reg[tmp_reg]] = StackPop(&cpu->stk);
+                
+                return CORRECT;
+            }
+
+            cpu->reg[tmp_reg] = StackPop(&cpu->stk);    
+            return CORRECT;
         }
+
         tmp_int = *((int*)(cpu->data + cpu->ip));
         cpu->ip += 4;
+
         if (cmd.ram == 1)
-        {
-            return INCORRECT_INPUT;
+        {   
+            cpu->ram[tmp_int] = StackPop(&cpu->stk);
+
+            return CORRECT;
         }
-        printf ("I AM GONNA POP!!!\n");
-        StackPop(&cpu->stk);
-        return 0;
+        
+        return INCORRECT_INPUT;
     }
+    */
     /*
     else if (command == MUL)
     {
@@ -178,25 +241,3 @@ int do_one_command (CPU* cpu)
         StackDtor(stk);
     }
     */
-    else
-    {
-        printf ("INCORRECT INPUT TOBI PIZDA!!!");
-        return INCORRECT_INPUT;
-    }
-    return CORRECT;
-
-}
-
-int do_all_commands (FILE* input_file, CPU* cpu)
-{
-    StackCtor(&cpu->stk, 10);
-    get_commands_from_asm(input_file, cpu); 
-    int correct_check = -1;
-    while (cpu->ip < cpu->data_size)
-    {
-        correct_check = do_one_command(cpu);
-        if (correct_check == INCORRECT_INPUT)
-            return INCORRECT_INPUT;
-    }
-    return CORRECT;
-}
