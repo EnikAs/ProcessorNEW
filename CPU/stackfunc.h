@@ -37,7 +37,7 @@ extern FILE* log_file;// a >> w
 
 //#define $printf printf
 
-typedef int elem_t;
+typedef double elem_t;
 
 
 const uint64_t CANARY_CONST = 0xDED32DED32DED32;

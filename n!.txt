@@ -1,0 +1,38 @@
+PUSH 1
+POP cx
+IN 
+PUSH -1
+ADD
+POP ex
+PUSH 1
+POP dx
+PUSH 1
+CALL :1
+PUSH 123
+PUSH 23
+HLT
+::1
+POP ax 
+POP bx 
+PUSH bx 
+PUSH 1
+ADD 
+POP bx
+PUSH bx
+PUSH cx
+MUL
+POP cx
+PUSH bx
+PUSH ex
+PUSH dx
+JAE :2
+PUSH dx
+PUSH 1
+ADD 
+POP dx
+CALL :1
+RET
+::2
+PUSH cx
+PRCH
+HLT

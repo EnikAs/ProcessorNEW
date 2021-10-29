@@ -1,5 +1,5 @@
 /*
-#include "disassembler.h"
+#include "disasm.h"
 
 FILE* input_file = fopen("assembler.txt", "rb");
 FILE* output_file = fopen("disasm.txt", "w");
@@ -19,8 +19,8 @@ com_buff* get_commands_from_asm (FILE* input_file)
 {
     int file_size = get_file_stat(input_file);
     com_buff* buf = (com_buff*) calloc(1, sizeof(com_buff));
-    buf->data = (elem_t*) calloc(file_size, 1);
-    fread(buf->data, sizeof(elem_t), file_size, input_file);
+    buf->data = (cpu_val*) calloc(file_size, 1);
+    fread(buf->data, sizeof(cpu_val), file_size, input_file);
     buf->com_cunt = buf->data[0];
     buf->tmp_elem += 1;
 

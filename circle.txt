@@ -1,4 +1,4 @@
-PUSH 15
+PUSH 12
 POP ax ;R
 PUSH 0
 POP ex

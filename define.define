@@ -11,11 +11,10 @@ if (cmd.reg == 1)
                 if (cmd.ram == 1)
                 {
                     sleep(1);
-                    tmp_ram = cpu->ram[tmp_int + cpu->reg[tmp_reg]];
+                    tmp_ram = cpu->ram[(int)tmp_int + (int)cpu->reg[tmp_reg]];
                     StackPush(&cpu->stk, tmp_ram);
                     return CORRECT;
                 }
-
                 StackPush(&cpu->stk, tmp_int + cpu->reg[tmp_reg]);
                 return CORRECT;
             }
@@ -23,11 +22,10 @@ if (cmd.reg == 1)
             else if (cmd.ram == 1)
             {
                 sleep(1);
-                tmp_ram = cpu->ram[cpu->reg[tmp_reg]];
+                tmp_ram = cpu->ram[(int)cpu->reg[tmp_reg]];
                 StackPush(&cpu->stk, tmp_ram);
                 return CORRECT;
             }
-
             StackPush(&cpu->stk, cpu->reg[tmp_reg]);
             return CORRECT;
         }
@@ -38,8 +36,7 @@ if (cmd.reg == 1)
         if (cmd.ram == 1)
         {   
             sleep(1);
-            tmp_ram = cpu->ram[tmp_int];
-            StackPush(&cpu->stk, tmp_ram);
+            StackPush(&cpu->stk, cpu->ram[(int)tmp_int]);
 
             return CORRECT;
         }
@@ -59,19 +56,17 @@ if (cmd.reg == 1)
                 if (cmd.ram == 1)
                 {
                     sleep(1);
-                    cpu->ram[tmp_int + cpu->reg[tmp_reg]] = StackPop(&cpu->stk);
+                    cpu->ram[(int)tmp_int + (int)cpu->reg[tmp_reg]] = StackPop(&cpu->stk);
 
                     return CORRECT;
                 }
-
                 return INCORRECT_INPUT;
             }
 
             else if (cmd.ram == 1)
             {
                 sleep(1);
-                cpu->ram[cpu->reg[tmp_reg]] = StackPop(&cpu->stk);
-                
+                cpu->ram[(int)cpu->reg[tmp_reg]] = StackPop(&cpu->stk);
                 return CORRECT;
             }
 
@@ -85,58 +80,156 @@ if (cmd.reg == 1)
         if (cmd.ram == 1)
         {   
             sleep(1);
-            cpu->ram[tmp_int] = StackPop(&cpu->stk);
+            cpu->ram[(int)tmp_int] = StackPop(&cpu->stk);
 
             return CORRECT;
         }
         
         return INCORRECT_INPUT;)
 
-DEF_CMD(3, MUL, 0,  
-StackPush(&cpu->stk, StackPop(&cpu->stk) * StackPop(&cpu->stk));)
+DEF_CMD(3, MUL, 0, 
+cpu_val a = $POP;
+cpu_val b = $POP;
+$PUSH(a * b);)
 
 DEF_CMD(4, DIV, 0,  
-StackPush(&cpu->stk, StackPop(&cpu->stk) / StackPop(&cpu->stk));)
+cpu_val a = $POP;
+cpu_val b = $POP;
+$PUSH(b / a);)
 
 DEF_CMD(5, SUB, 0,  
-StackPush(&cpu->stk, StackPop(&cpu->stk) - StackPop(&cpu->stk));)
+cpu_val a = $POP;
+cpu_val b = $POP;
+$PUSH(b - a);)
 
 DEF_CMD(6, ADD, 0,  
-StackPush(&cpu->stk, StackPop(&cpu->stk) + StackPop(&cpu->stk));)
+cpu_val a = $POP;
+cpu_val b = $POP;
+$PUSH(a + b);)
 
 DEF_CMD(7, OUT, 0,  
 StackDtor(&cpu->stk);)
 
 DEF_CMD(9, IN, 0, 
-cpu_val a = 0;scanf("%d", &a);StackPush(&cpu->stk, a);)
+cpu_val a = 0;
+scanf("%lf", &a);
+$PUSH(a);)
 
 DEF_CMD(10, JMP, 1, 
-tmp_int = *((cpu_val*)(cpu->data + cpu->ip));
-cpu->ip += sizeof(cpu_val);
-cpu->ip = tmp_int;
+SETIP
 return CORRECT;)
 
 DEF_CMD(11, PRCH, 0, 
-int a = 0 ;
+cpu_val a = 0 ;
 a = StackPop(&cpu->stk);
-printf("->%d<-\n", a);
+printf("value = %lf\n", a);
 return CORRECT;)
 
-DEF_CMD(12, CALL, 1, 
-tmp_int = *((cpu_val*)(cpu->data + cpu->ip));
-cpu->ip += sizeof(cpu_val);
-StackPush(&cpu->stk, cpu->ip);
-cpu->ip = tmp_int;
+DEF_CMD(12, CALL, 1,
+$PUSH(cpu->ip + sizeof(cpu_val));
+SETIP
 return CORRECT;)
 
 DEF_CMD(13, RET, 0, 
-int a = 0;
-a = StackPop(&cpu->stk);
-cpu->ip = a;
+cpu->ip = $POP;
 return CORRECT;)
 
 DEF_CMD(14, HLT, 0, 
 return END_OF_PROG;)
+
+DEF_CMD(17, VRAMPR, 0, 
+for(int i = 0 ; i < 50; i++ )
+{
+    for(int j = 0 ; j < 50; j++)
+    {
+        if(cpu->ram[RAM_SIZE + 50 * i + j] == 0)
+        {
+            printf(".");
+        }
+        else 
+            printf("*");
+    }
+    printf("\n");
+})
+
+DEF_CMD(18, JA, 1,  
+cpu_val a = $POP;
+cpu_val b = $POP;
+if (a > b)
+{
+    SETIP
+}
+else 
+    cpu->ip += sizeof(cpu_val);
+)
+
+DEF_CMD(19, JAE, 1,  
+cpu_val a = $POP;
+cpu_val b = $POP;
+if (a >= b)
+{
+    SETIP
+}
+else 
+    cpu->ip += sizeof(cpu_val);
+)
+
+DEF_CMD(20, JB, 1,  
+cpu_val a = $POP;
+cpu_val b = $POP;
+if (a < b)
+{
+    SETIP
+}
+else 
+    cpu->ip += sizeof(cpu_val);
+)
+
+DEF_CMD(21, JBE, 1,  
+cpu_val a = $POP;
+cpu_val b = $POP;
+if ( b - a >= EPSILON )
+{
+    SETIP
+}
+else 
+    cpu->ip += sizeof(cpu_val);
+)
+
+DEF_CMD(22, JE, 1,  
+cpu_val a = $POP;
+cpu_val b = $POP;
+if (fabs(a - b) < EPSILON)
+{
+    SETIP
+}
+else
+{ 
+    cpu->ip += sizeof(cpu_val);  
+})
+
+DEF_CMD(23, JNE, 1,  
+cpu_val a = $POP;
+cpu_val b = $POP;
+if (a != b)
+{
+    SETIP
+}
+else 
+    cpu->ip += sizeof(cpu_val);
+)
+
+DEF_CMD(24, SQRT, 0,
+cpu_val a = $POP;
+a = sqrt(a);    
+$PUSH(a);
+)
+
+DEF_CMD(25, VRAM, 0,
+cpu_val a = $POP;
+cpu_val b = $POP;
+cpu->ram[RAM_SIZE + 50 * (int)a + (int)b] = 1; 
+)
 
 DEF_CMD(8, INCORRECT_INPUT, 0,  
 return INCORRECT_INPUT;)

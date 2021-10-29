@@ -12,12 +12,18 @@
 #include <unistd.h>
 
 #include "stackfunc.h"
-//#include "C:/VSC progs/Processor/stackfunc.cpp"
 #include "C:/VSCprogs/Processor/cmd-enum.h"
 
+#define SETIP                                       \
+tmp_int = *((cpu_val*)(cpu->data + cpu->ip));       \
+cpu->ip = (int)tmp_int;                             \
+
+#define $PUSH(arg) StackPush(&cpu->stk, arg)
+#define $POP StackPop(&cpu->stk)
+
 const int RAM_SIZE = 10000;
-const int VRAM_SIZE = 10000;
-const int REG_CUNT = 4;
+const int VRAM_SIZE = 2500;
+const int REG_CUNT = 6;
 
 enum for_end
 {
@@ -30,15 +36,17 @@ struct CPU
     int ip = 0;
     int data_size = 0;
 
-    int reg[REG_CUNT] = {};
+    double reg[REG_CUNT] = {};
     /* 
     вот они слева направо 
     ax  =   reg[0]; 
     bx  =   reg[1];
     cx  =   reg[2];
     dx  =   reg[3];
+    ex  =   reg[4];
+    fx  =   reg[5];
     */
-    int ram[RAM_SIZE + VRAM_SIZE] = {};
+    double ram[RAM_SIZE + VRAM_SIZE] = {};
     int ram_ip = 0;
 };
 

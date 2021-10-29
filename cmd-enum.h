@@ -1,11 +1,13 @@
 #ifndef COMMSENUM_H_INCLUDED
 #define COMMSENUM_H_INCLUDED
 
-#define DEF_CMD(num, name, ...)     \
+#include <cmath>
+#define DEF_CMD(num, name, ...)    \
 name = num,     
 
-typedef int cpu_val;     
+typedef double cpu_val;     
 
+const int EPSILON = 1;
 enum commands
 {
     #include "define.define"

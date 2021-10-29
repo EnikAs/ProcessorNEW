@@ -44,6 +44,7 @@ int init_one_command (CPU* cpu)
     }
 }
 
+
 #undef DEF_CMD
 
 #define DEF_CMD(num, name, arg, code)   \
@@ -54,7 +55,7 @@ int init_one_command (CPU* cpu)
 
 int do_one_command (CPU* cpu)
 {
-    int tmp_int = 0;
+    double tmp_int = 0;
     int tmp_reg = 0;
     int tmp_ram = 0;
     int command = init_one_command(cpu);
@@ -64,7 +65,7 @@ int do_one_command (CPU* cpu)
     cpu->ip += 1;
 
     //cpu_dump(cpu);
-    //getchar();
+    
     if(0);
 
     #include "C:/VSCprogs/Processor/define.define"
@@ -79,13 +80,9 @@ int do_one_command (CPU* cpu)
 
 void cpu_dump(CPU *cpu)
 {
-	
 	assert(cpu);
 	
-	//fprintf(file, "\n\n\n\n**********CPU CODE DUMP**********\n\n");
-	int size = cpu->data_size;
-	if (cpu->data_size > 255)
-		size = 255;
+    int size = cpu->data_size;
 
 	for (int i = 0; i!= size; i++) {
 		printf("%02d ", i);
@@ -101,12 +98,9 @@ void cpu_dump(CPU *cpu)
 	printf("%*s\n", cpu->ip * 3 - 2, "^");
 
     getchar();
-	//sleep(3);
+	//sleep(2);
 }
     
-
-
-
 int do_all_commands (FILE* input_file, CPU* cpu)
 {
     StackCtor(&cpu->stk, 10);

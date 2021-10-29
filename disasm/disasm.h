@@ -1,6 +1,6 @@
-/*
-#ifndef DISASSEMBLER_H_INCLUDED
-#define DISASSEMBLER_H_INCLUDED
+
+#ifndef DISASM_H_INCLUDED
+#define DISASM_H_INCLUDED
 
 #include <iostream>
 #include <iostream>
@@ -11,13 +11,12 @@
 #include <cassert>
 #include <sys\stat.h>
 
-#include "stackfunc.h"
-#include "assembler.h"
-#include "commsenum.h"
+
+#include "C:/VSCprogs/Processor/cmd-enum.h"
 
 struct com_buff
 {
-    elem_t* data;
+    cpu_val* data;
     int tmp_elem = 0;
     int com_cunt = 0;
 };
@@ -33,4 +32,3 @@ int dis_all_commands (FILE* input_file);
 int init_one_command (com_buff* buf);
 
 #endif 
-*/

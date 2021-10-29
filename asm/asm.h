@@ -11,7 +11,6 @@
 #include <sys\stat.h>
 
 
-//#include "C:/VSCprogs/Processor/stackfunc.h"
 #include "C:/VSCprogs/Processor/cmd-enum.h"
 
 

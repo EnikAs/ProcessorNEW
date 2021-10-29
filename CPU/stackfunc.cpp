@@ -269,7 +269,7 @@ void StackDump (Stack* stk, const int str_num, const char* func_name, const char
             }
             else
             {
-            $printf("data[%d] = %d ", i, stk->data[i]);
+            $printf("data[%d] = %lf", i, stk->data[i]);
             $printf("| ptr = %d\n", &stk->data[i]);
             }        
         }
