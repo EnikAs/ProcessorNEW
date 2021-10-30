@@ -67,6 +67,8 @@ int          get_one_command            (Commands* com, buffer* buf);
 
 int          push_one_command           (Commands* com, char_mas* array, int* tmp_com, int* tags);
 
+int          init_cmd_bait              (int num, Commands* com, char_mas* array, int* tmp_com, double* tmp_int, char* tmp_reg, char* skobka, int* tags, Cmd* bait, int* tmp_tag);
+
 Commands*    commands_init              (buffer* buf);
 
 #endif 

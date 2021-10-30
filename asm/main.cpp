@@ -1,7 +1,6 @@
 #include "asm.h"
 
 extern FILE* assembler_file;
-extern int tags[10];
 
 int main()
 {

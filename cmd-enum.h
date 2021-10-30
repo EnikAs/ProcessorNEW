@@ -4,11 +4,11 @@
 #include <cmath>
 #include <windows.h>
 #define DEF_CMD(num, name, ...)    \
-THIS_IS_SMTH_NEW_##name = num,     
+CODE_##name = num,     
 
 typedef double cpu_val;     
 
-const int EPSILON = 1e-6;
+const int EPSILON = 1e-2;
 enum commands
 {
     #include "define.define"

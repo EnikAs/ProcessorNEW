@@ -151,8 +151,7 @@ int get_one_command (Commands* com, buffer* buf)
 
 int define_fix (int num, Commands* com, char_mas* array, int* tmp_com, double* tmp_int, char* tmp_reg, char* skobka, int* tags, Cmd* bait, int* tmp_tag)
 {
-    if (arg > 0)                                                                           
-        {                                                                                      
+                                                                                    
             *tmp_com += 1;                                                                     
             if (sscanf(com[*tmp_com].command, "[%lf+%cx%c", tmp_int, tmp_reg, skobka) == 3) 
             {                                                                                  
@@ -175,7 +174,7 @@ int define_fix (int num, Commands* com, char_mas* array, int* tmp_com, double* t
             }                                                                                  
             else if (sscanf(com[*tmp_com].command, "[%cx%c", tmp_reg, skobka) == 2)          
             {                                                                                  
-                if (skobka == ']')                                                             
+                if (*skobka == ']')                                                             
                 {                                                                              
                 bait->ram = 1;                                                                  
                 bait->reg = 1;                                                                  
@@ -184,14 +183,14 @@ int define_fix (int num, Commands* com, char_mas* array, int* tmp_com, double* t
                 else{                                                                          
                     return INCORRECT_INPUT;}                                                   
                                                                                                
-                *((Cmd*)((char*)array->mas + array->ip)) = bait;                               
+                *((Cmd*)((char*)array->mas + array->ip)) = *bait;                               
                 array->ip += 1;                                                                
                 *((char*)((char*)array->mas + array->ip)) = *tmp_reg - 'a';                     
                 array->ip += 1;                                                                
             }                                                                                  
             else if (sscanf(com[*tmp_com].command, "[%lf%c", tmp_int, skobka) == 2)          
             {                                                                                  
-                if (skobka == ']')                                                             
+                if (*skobka == ']')                                                             
                 {                                                                              
                 bait->ram = 1;                                                                  
                 bait->konst = 1;                                                                
@@ -233,7 +232,6 @@ int define_fix (int num, Commands* com, char_mas* array, int* tmp_com, double* t
                 array->ip += sizeof(cpu_val);                                                  
             }                                                                                  
         }
-}
 
 #undef DEF_CMD//нужно сделать функцию и вызывать ее из дефайна (разделить дефайн)
 
@@ -242,7 +240,6 @@ else if (strcmp(com[*tmp_com].command, #name) == 0)                             
     {                                                                                          \
         if (arg > 0)                                                                           \
         {                                                                                      \
-            int define_fix (num, com, array, tmp_com, &tmp_int, &tmp_reg, &skobka, tags, &bait, &tmp_tag)\
             *tmp_com += 1;                                                                     \
             if (sscanf(com[*tmp_com].command, "[%lf+%cx%c", &tmp_int, &tmp_reg, &skobka) == 3) \
             {                                                                                  \
@@ -251,7 +248,7 @@ else if (strcmp(com[*tmp_com].command, #name) == 0)                             
                 bait.ram = 1;                                                                  \
                 bait.reg = 1;                                                                  \
                 bait.konst = 1;                                                                \
-                bait.cmd = num;                                                               \
+                bait.cmd = num;                                                                \
                 }                                                                              \
                 else                                                                           \
                     return INCORRECT_INPUT;                                                    \
@@ -269,10 +266,10 @@ else if (strcmp(com[*tmp_com].command, #name) == 0)                             
                 {                                                                              \
                 bait.ram = 1;                                                                  \
                 bait.reg = 1;                                                                  \
-                bait.cmd = num;                                                               \
+                bait.cmd = num;                                                                \
                 }                                                                              \
-                else{                                                                           \
-                    return INCORRECT_INPUT;}                                                    \
+                else{                                                                          \
+                    return INCORRECT_INPUT;}                                                   \
                                                                                                \
                 *((Cmd*)((char*)array->mas + array->ip)) = bait;                               \
                 array->ip += 1;                                                                \

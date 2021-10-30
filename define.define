@@ -199,7 +199,7 @@ else
 DEF_CMD(22, JE, 1,  
 cpu_val a = $POP;
 cpu_val b = $POP;
-if (fabs(a - b) < EPSILON)
+if (a - b == 0)
 {
     SETIP
 }

@@ -1,5 +1,4 @@
 IN ;a
-
 IN ;b
 IN ;c 
 POP cx
@@ -8,6 +7,7 @@ POP ax
 PUSH ax
 PUSH 0
 JE :5
+
 CALL :1
 PUSH dx ;in_dx_now_discr
 PUSH dx
