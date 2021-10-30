@@ -1,9 +1,13 @@
 IN ;a
+
 IN ;b
 IN ;c 
 POP cx
 POP bx
 POP ax
+PUSH ax
+PUSH 0
+JE :5
 CALL :1
 PUSH dx ;in_dx_now_discr
 PUSH dx
@@ -59,6 +63,9 @@ HLT
     PUSH ex
     HLT
 ::3 ;discr_==_0
+    PUSH bx
+    PUSH 0
+    JE :8
     POP ex
     PUSH -1
     PUSH bx
@@ -71,12 +78,44 @@ HLT
     PUSH ex
     HLT
 ::4 ;discr_<_0
-    POP ex
     PUSH 8
     PUSH 8
     PUSH 14
     PRCH
     PRCH
     PRCH
-    PUSH ex
     HLT
+::5 ;a_==_0
+    PUSH cx
+    PUSH 0
+    JE :6
+    PUSH bx
+    PUSH 0
+    JE :4
+    PUSH bx
+    PUSH cx
+    PUSH -1
+    MUL
+    DIV
+    PRCH
+    HLT
+::6 ;x_=_0
+    PUSH bx
+    PUSH 0
+    JE :7
+    PUSH 0
+    PRCH
+    HLT
+::7 ;a==0_b==0
+    PUSH 8
+    PUSH 2
+    PUSH 2
+    PRCH
+    PRCH
+    PRCH
+    HLT
+::8 ;d==0_b==0
+    PUSH 0
+    PRCH
+    HLT
+

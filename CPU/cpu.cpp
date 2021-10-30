@@ -1,8 +1,6 @@
 
 #include "cpu.h"
 
-FILE* input_file = fopen("C:/VSCprogs/Processor/assembler.jopa", "rb");
-
 int get_file_stat (FILE* input_file)
 {
     struct stat file;
@@ -17,7 +15,7 @@ int get_file_stat (FILE* input_file)
 CPU* get_commands_from_asm (FILE* input_file, CPU* cpu)
 {
     int file_size = get_file_stat(input_file);
-    
+    //free!!!!!!!!!
     cpu->data = (char*) calloc(file_size, 1);
     fread(cpu->data, sizeof(char), file_size, input_file);
     cpu->data_size = file_size;
@@ -28,27 +26,8 @@ CPU* get_commands_from_asm (FILE* input_file, CPU* cpu)
 
 #undef DEF_CMD
 
-#define DEF_CMD(num, name, ...)         \
-    case name:                          \
-        return name;                    \
-        break;                          \
-        
-int init_one_command (CPU* cpu)
-{
-    Cmd cmd = {};
-    cmd = *((Cmd*)(cpu->data + cpu->ip));
-    //printf("|%u|\t|%u|\t|%u|\t|%d|\n\n", cmd.ram, cmd.reg, cmd.konst, cmd.cmd);
-    switch((int)cmd.cmd)
-    {
-        #include "C:/VSCprogs/Processor/define.define"
-    }
-}
-
-
-#undef DEF_CMD
-
 #define DEF_CMD(num, name, arg, code)   \
-    else if(command == name)            \
+    else if(cmd.cmd == num)             \
     {                                   \
         code                            \
     }                                   \
@@ -58,7 +37,6 @@ int do_one_command (CPU* cpu)
     double tmp_int = 0;
     int tmp_reg = 0;
     int tmp_ram = 0;
-    int command = init_one_command(cpu);
 
     Cmd cmd = {};
     cmd = *((Cmd*)(cpu->data + cpu->ip));
@@ -72,7 +50,7 @@ int do_one_command (CPU* cpu)
     
     else
     {
-        printf ("INCORRECT INPUT TOBI PIZDA!!!");
+        printf ("INCORRECT INPUT!!");
         return INCORRECT_INPUT;
     }
     return CORRECT;
@@ -109,8 +87,8 @@ int do_all_commands (FILE* input_file, CPU* cpu)
     while (cpu->ip < cpu->data_size)
     {
         correct_check = do_one_command(cpu);
-        if (correct_check == INCORRECT_INPUT)
-            return INCORRECT_INPUT;
+        if (correct_check == THIS_IS_SMTH_NEW_INCORRECT_INPUT)
+            return THIS_IS_SMTH_NEW_INCORRECT_INPUT;
         if (correct_check == END_OF_PROG)
             return END_OF_PROG;
     }

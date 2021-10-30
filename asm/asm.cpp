@@ -1,16 +1,14 @@
 #include "asm.h"
 
-FILE* calc_file = fopen("C:/VSCprogs/Processor/calc.txt", "r");
-FILE* assembler_file = fopen("C:/VSCprogs/Processor/assembler.jopa", "wb");
-int tags[10] = {}; // плохо, но, наверное можно
-
-int print_all_commands (FILE* file_stream)
+int print_all_commands (FILE* assembler_file, FILE* calc_file)
 {
     if (assembler_file == NULL)
         printf("NULL!!!");
 
     buffer* buf = (buffer*) calloc(1, sizeof(buffer));
     
+    int tags[10] = {}; // *ЭТО БЫЛО ГЛОБАЛКОЙ* плохо, но, наверное можно (нет не можно))
+
     char_mas array = {};
     
     buffer_init(buf, calc_file);
@@ -32,13 +30,13 @@ int print_all_commands (FILE* file_stream)
     
     for (tmp_com = 0 ; tmp_com < buf->tmp_string_cunt ; tmp_com++)
     {
-        push_one_command(com, &array, &tmp_com);
+        push_one_command(com, &array, &tmp_com, tags);
     }
     tmp_com = 0;
     array = {};
     for (tmp_com = 0 ; tmp_com < buf->tmp_string_cunt ; tmp_com++)
     {
-        push_one_command(com, &array, &tmp_com);
+        push_one_command(com, &array, &tmp_com, tags);
     }
     
     fwrite(array.mas, sizeof(char), array.ip , assembler_file); // +1 не нужно, так как ip сам увеличивается на эту "дополнительную" единицу 
@@ -151,100 +149,189 @@ int get_one_command (Commands* com, buffer* buf)
     return -1;
 }
 
+int define_fix (int num, Commands* com, char_mas* array, int* tmp_com, double* tmp_int, char* tmp_reg, char* skobka, int* tags, Cmd* bait, int* tmp_tag)
+{
+    if (arg > 0)                                                                           
+        {                                                                                      
+            *tmp_com += 1;                                                                     
+            if (sscanf(com[*tmp_com].command, "[%lf+%cx%c", tmp_int, tmp_reg, skobka) == 3) 
+            {                                                                                  
+                if (*skobka == ']')                                                             
+                {                                                                              
+                bait->ram = 1;                                                                  
+                bait->reg = 1;                                                                  
+                bait->konst = 1;                                                                
+                bait->cmd = num;                                                               
+                }                                                                              
+                else                                                                           
+                    return INCORRECT_INPUT;                                                    
+                                                                                               
+                *((Cmd*)((char*)array->mas + array->ip)) = *bait;                               
+                array->ip += 1;                                                                
+                *((char*)((char*)array->mas + array->ip)) = *tmp_reg - 'a';                     
+                array->ip += 1;                                                                
+                *((cpu_val*)((char*)array->mas + array->ip)) = *tmp_int;                        
+                array->ip += sizeof(cpu_val);                                                  
+            }                                                                                  
+            else if (sscanf(com[*tmp_com].command, "[%cx%c", tmp_reg, skobka) == 2)          
+            {                                                                                  
+                if (skobka == ']')                                                             
+                {                                                                              
+                bait->ram = 1;                                                                  
+                bait->reg = 1;                                                                  
+                bait->cmd = num;                                                               
+                }                                                                              
+                else{                                                                          
+                    return INCORRECT_INPUT;}                                                   
+                                                                                               
+                *((Cmd*)((char*)array->mas + array->ip)) = bait;                               
+                array->ip += 1;                                                                
+                *((char*)((char*)array->mas + array->ip)) = *tmp_reg - 'a';                     
+                array->ip += 1;                                                                
+            }                                                                                  
+            else if (sscanf(com[*tmp_com].command, "[%lf%c", tmp_int, skobka) == 2)          
+            {                                                                                  
+                if (skobka == ']')                                                             
+                {                                                                              
+                bait->ram = 1;                                                                  
+                bait->konst = 1;                                                                
+                bait->cmd = num;                                                                
+                }                                                                              
+                else{                                                                          
+                    return INCORRECT_INPUT;}                                                   
+                                                                                               
+                *((Cmd*)(array->mas + array->ip)) = *bait;                                      
+                array->ip += 1;                                                                
+                *((cpu_val*)(array->mas + array->ip)) = *tmp_int;                               
+                array->ip += sizeof(cpu_val);                                                  
+            }                                                                                  
+            else if (sscanf(com[*tmp_com].command, "%cx", tmp_reg) == 1 && isalpha(*tmp_reg) != 0)  
+            {                                                                                  
+                bait->reg = 1;                                                                  
+                bait->cmd = num;                                                               
+                *((Cmd*)(array->mas + array->ip)) = *bait;                                      
+                array->ip += 1;                                                                
+                *((char*)((char*)array->mas + array->ip)) = *tmp_reg - 'a';                     
+                array->ip += 1;                                                                
+            }                                                                                  
+            else if(sscanf(com[*tmp_com].command, "%lf", tmp_int) == 1)                       
+            {                                                                                  
+                bait->konst = 1;                                                                
+                bait->cmd = num;                                                               
+                *((Cmd*)(array->mas + array->ip)) = *bait;                                      
+                array->ip += 1;                                                                
+                *((cpu_val*)(array->mas + array->ip)) = *tmp_int;                               
+                array->ip += sizeof(cpu_val);                                                  
+            }                                                                                  
+            else if(sscanf(com[*tmp_com].command, ":%d", tmp_tag) == 1)                       
+            {                                                                                  
+                bait->konst = 1;                                                                
+                bait->cmd = num;                                                               
+                *((Cmd*)(array->mas + array->ip)) = *bait;                                      
+                array->ip += 1;                                                                
+                *((cpu_val*)(array->mas + array->ip)) = tags[*tmp_tag];                         
+                array->ip += sizeof(cpu_val);                                                  
+            }                                                                                  
+        }
+}
 
-#undef DEF_CMD
+#undef DEF_CMD//нужно сделать функцию и вызывать ее из дефайна (разделить дефайн)
 
 #define DEF_CMD(num, name, arg, ...)                                                           \
 else if (strcmp(com[*tmp_com].command, #name) == 0)                                            \
     {                                                                                          \
         if (arg > 0)                                                                           \
         {                                                                                      \
+            int define_fix (num, com, array, tmp_com, &tmp_int, &tmp_reg, &skobka, tags, &bait, &tmp_tag)\
             *tmp_com += 1;                                                                     \
-            if (sscanf(com[*tmp_com].command, "[%lf+%cx%c", &tmp_int, &tmp_reg, &skobka) == 3)  \
+            if (sscanf(com[*tmp_com].command, "[%lf+%cx%c", &tmp_int, &tmp_reg, &skobka) == 3) \
             {                                                                                  \
                 if (skobka == ']')                                                             \
                 {                                                                              \
                 bait.ram = 1;                                                                  \
                 bait.reg = 1;                                                                  \
                 bait.konst = 1;                                                                \
-                bait.cmd = name;                                                               \
+                bait.cmd = num;                                                               \
                 }                                                                              \
                 else                                                                           \
                     return INCORRECT_INPUT;                                                    \
+                                                                                               \
                 *((Cmd*)((char*)array->mas + array->ip)) = bait;                               \
                 array->ip += 1;                                                                \
                 *((char*)((char*)array->mas + array->ip)) = tmp_reg - 'a';                     \
                 array->ip += 1;                                                                \
-                *((cpu_val*)((char*)array->mas + array->ip)) = tmp_int;                            \
-                array->ip += sizeof(cpu_val);                                                                \
+                *((cpu_val*)((char*)array->mas + array->ip)) = tmp_int;                        \
+                array->ip += sizeof(cpu_val);                                                  \
             }                                                                                  \
             else if (sscanf(com[*tmp_com].command, "[%cx%c", &tmp_reg, &skobka) == 2)          \
             {                                                                                  \
                 if (skobka == ']')                                                             \
-                {                                                                             \
+                {                                                                              \
                 bait.ram = 1;                                                                  \
                 bait.reg = 1;                                                                  \
-                bait.cmd = name;                                                               \
+                bait.cmd = num;                                                               \
                 }                                                                              \
-                else                                                                           \
-                    return INCORRECT_INPUT;                                                    \
+                else{                                                                           \
+                    return INCORRECT_INPUT;}                                                    \
+                                                                                               \
                 *((Cmd*)((char*)array->mas + array->ip)) = bait;                               \
                 array->ip += 1;                                                                \
                 *((char*)((char*)array->mas + array->ip)) = tmp_reg - 'a';                     \
                 array->ip += 1;                                                                \
             }                                                                                  \
-            else if (sscanf(com[*tmp_com].command, "[%lf%c", &tmp_int, &skobka) == 2)           \
+            else if (sscanf(com[*tmp_com].command, "[%lf%c", &tmp_int, &skobka) == 2)          \
             {                                                                                  \
                 if (skobka == ']')                                                             \
                 {                                                                              \
                 bait.ram = 1;                                                                  \
                 bait.konst = 1;                                                                \
-                bait.cmd = name;                                                               \
+                bait.cmd = num;                                                                \
                 }                                                                              \
-                else                                                                           \
-                    return INCORRECT_INPUT;                                                    \
+                else{                                                                          \
+                    return INCORRECT_INPUT;}                                                   \
+                                                                                               \
                 *((Cmd*)(array->mas + array->ip)) = bait;                                      \
                 array->ip += 1;                                                                \
-                *((cpu_val*)(array->mas + array->ip)) = tmp_int;                                   \
-                array->ip += sizeof(cpu_val);                                                                \
+                *((cpu_val*)(array->mas + array->ip)) = tmp_int;                               \
+                array->ip += sizeof(cpu_val);                                                  \
             }                                                                                  \
             else if (sscanf(com[*tmp_com].command, "%cx", &tmp_reg) == 1 && isalpha(tmp_reg) != 0)  \
             {                                                                                  \
                 bait.reg = 1;                                                                  \
-                bait.cmd = name;                                                               \
+                bait.cmd = num;                                                               \
                 *((Cmd*)(array->mas + array->ip)) = bait;                                      \
                 array->ip += 1;                                                                \
                 *((char*)((char*)array->mas + array->ip)) = tmp_reg - 'a';                     \
                 array->ip += 1;                                                                \
             }                                                                                  \
-            else if(sscanf(com[*tmp_com].command, "%lf", &tmp_int) == 1)                        \
+            else if(sscanf(com[*tmp_com].command, "%lf", &tmp_int) == 1)                       \
             {                                                                                  \
                 bait.konst = 1;                                                                \
-                bait.cmd = name;                                                               \
+                bait.cmd = num;                                                               \
                 *((Cmd*)(array->mas + array->ip)) = bait;                                      \
                 array->ip += 1;                                                                \
-                *((cpu_val*)(array->mas + array->ip)) = tmp_int;                                   \
-                array->ip += sizeof(cpu_val);                                                                \
+                *((cpu_val*)(array->mas + array->ip)) = tmp_int;                               \
+                array->ip += sizeof(cpu_val);                                                  \
             }                                                                                  \
-            else if(sscanf(com[*tmp_com].command, ":%d", &tmp_tag) == 1)                        \
+            else if(sscanf(com[*tmp_com].command, ":%d", &tmp_tag) == 1)                       \
             {                                                                                  \
                 bait.konst = 1;                                                                \
-                bait.cmd = name;                                                               \
+                bait.cmd = num;                                                               \
                 *((Cmd*)(array->mas + array->ip)) = bait;                                      \
                 array->ip += 1;                                                                \
-                *((cpu_val*)(array->mas + array->ip)) = tags[tmp_tag];                                   \
-                array->ip += sizeof(cpu_val);                                                                \
+                *((cpu_val*)(array->mas + array->ip)) = tags[tmp_tag];                         \
+                array->ip += sizeof(cpu_val);                                                  \
             }                                                                                  \
         }                                                                                      \
         else                                                                                   \
         {                                                                                      \
-            bait.cmd = name;                                                                   \
+            bait.cmd = num;                                                                   \
             *((Cmd*)(array->mas + array->ip)) = bait;                                          \
             array->ip += 1;                                                                    \
         }                                                                                      \
     }                                                                                          \
 
-int push_one_command (Commands* com, char_mas* array, int* tmp_com)
+int push_one_command (Commands* com, char_mas* array, int* tmp_com, int* tags)
 {
     Cmd bait = {};
     double tmp_int = 0; 
@@ -264,7 +351,7 @@ int push_one_command (Commands* com, char_mas* array, int* tmp_com)
 
     else
     {  
-        bait.cmd = INCORRECT_INPUT;    
+        bait.cmd = THIS_IS_SMTH_NEW_INCORRECT_INPUT;    
         *((Cmd*)(array->mas + array->ip)) = bait;
         array->ip += 1; // sizeof(bait)
     }

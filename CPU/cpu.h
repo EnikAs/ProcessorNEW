@@ -27,7 +27,8 @@ const int REG_CUNT = 6;
 
 enum for_end
 {
-    END_OF_PROG = 1488
+    END_OF_PROG = 1488,
+    INCORRECT_INPUT
 };
 struct CPU 
 {
@@ -65,8 +66,6 @@ int get_file_stat (FILE* input_file);
 CPU* get_commands_from_asm (FILE* input_file, CPU* buf);
 
 int do_one_command (CPU* cpu);
-
-int init_one_command (CPU* cpu);
 
 int do_all_commands (FILE* input_file, CPU* cpu);
 

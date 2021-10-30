@@ -19,7 +19,8 @@ typedef int elem_t;
 enum end_of_file
 {
     END_OF_FILE,
-    NOT_END_OF_FILE
+    NOT_END_OF_FILE,
+    INCORRECT_INPUT
 };
 
 struct Commands
@@ -54,7 +55,7 @@ struct buffer
 
 size_t       scanf_file_size            (FILE* file_stream);
 
-int          print_all_commands         (FILE* file_stream);
+int          print_all_commands         (FILE* assembler_file, FILE* calc_file);
 
 int          buffer_init                (buffer* buf, FILE* file_stream);
 
@@ -64,7 +65,7 @@ int          get_all_commands           (Commands* com, buffer* buf);
 
 int          get_one_command            (Commands* com, buffer* buf);
 
-int          push_one_command           (Commands* com, char_mas* array, int* tmp_com);
+int          push_one_command           (Commands* com, char_mas* array, int* tmp_com, int* tags);
 
 Commands*    commands_init              (buffer* buf);
 

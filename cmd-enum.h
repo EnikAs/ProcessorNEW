@@ -2,12 +2,13 @@
 #define COMMSENUM_H_INCLUDED
 
 #include <cmath>
+#include <windows.h>
 #define DEF_CMD(num, name, ...)    \
-name = num,     
+THIS_IS_SMTH_NEW_##name = num,     
 
 typedef double cpu_val;     
 
-const int EPSILON = 1;
+const int EPSILON = 1e-6;
 enum commands
 {
     #include "define.define"

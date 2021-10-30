@@ -1,57 +1,62 @@
-PUSH 12
-POP ax ;R
-PUSH 0
-POP ex
+    PUSH 12
+    POP ax ;R
+    PUSH 0
+    POP ex
 ::1
-PUSH 0
-POP fx ;y
+    PUSH 0
+    POP fx ;y
 ::2
-PUSH fx
-PUSH 25
-SUB
-PUSH fx
-PUSH 25
-SUB
-MUL
-PUSH ex
-PUSH 25
-SUB
-PUSH ex
-PUSH 25
-SUB
-MUL
-ADD
-PUSH ax
-PUSH ax
-MUL
-CALL :3
-PUSH 1
-PUSH fx ;x
-ADD
-POP fx
-PUSH fx
-PUSH 50
-JA :2
-PUSH ex ;x
-PUSH 1
-ADD
-POP ex
-PUSH ex
-PUSH 50
-JA :1
-VRAMPR
+    PUSH fx
+    PUSH 25
+    SUB
+    PUSH fx
+    PUSH 25
+    SUB
+    MUL
+    PUSH ex
+    PUSH 25
+    SUB
+    PUSH ex
+    PUSH 25
+    SUB
+    MUL
+    ADD
+    PUSH ax
+    PUSH ax
+    MUL
+
+    CALL :3
+    
+    PUSH 1
+    PUSH fx ;x
+    ADD
+    POP fx
+    PUSH fx
+    PUSH 50
+    JA :2
+
+    PUSH ex ;x
+    PUSH 1
+    ADD
+    POP ex
+    PUSH ex
+    PUSH 50
+    JA :1
+
+    VRAMPR
 
 ::3
-POP bx ;trash
-JA :4
-PUSH bx
-RET
+    POP bx ;trash
+    JA :4
+    PUSH bx
+    RET
+
 ::4
-PUSH ex
-PUSH fx
-VRAM
-PUSH bx
-RET
+    PUSH ex
+    PUSH fx
+    VRAM
+    PUSH bx
+    RET
 
 
 
