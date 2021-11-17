@@ -4,7 +4,7 @@ extern FILE* assembler_file;
 
 int main()
 {
-    FILE* calc_file = fopen("C:/VSCprogs/Processor/quadratic.txt", "r");
+    FILE* calc_file = fopen("C:/VSCprogs/Processor/circle.txt", "r");
     if (calc_file == NULL)
         printf("CALC FILE NOT OPENED!!!");
 

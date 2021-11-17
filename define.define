@@ -60,7 +60,7 @@ if (cmd.reg == 1)
 
                     return CORRECT;
                 }
-                return THIS_IS_SMTH_NEW_INCORRECT_INPUT;
+                return CODE_INCORRECT_INPUT;
             }
 
             else if (cmd.ram == 1)
@@ -85,7 +85,7 @@ if (cmd.reg == 1)
             return CORRECT;
         }
         
-        return THIS_IS_SMTH_NEW_INCORRECT_INPUT;)
+        return CODE_INCORRECT_INPUT;)
 
 DEF_CMD(3, MUL, 0, 
 cpu_val a = $POP;
@@ -232,4 +232,4 @@ cpu->ram[RAM_SIZE + 50 * (int)a + (int)b] = 1;
 )
 
 DEF_CMD(8, INCORRECT_INPUT, 0,  
-return THIS_IS_SMTH_NEW_INCORRECT_INPUT;)
+return CODE_INCORRECT_INPUT;)

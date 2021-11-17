@@ -87,8 +87,8 @@ int do_all_commands (FILE* input_file, CPU* cpu)
     while (cpu->ip < cpu->data_size)
     {
         correct_check = do_one_command(cpu);
-        if (correct_check == THIS_IS_SMTH_NEW_INCORRECT_INPUT)
-            return THIS_IS_SMTH_NEW_INCORRECT_INPUT;
+        if (correct_check == CODE_INCORRECT_INPUT)
+            return CODE_INCORRECT_INPUT;
         if (correct_check == END_OF_PROG)
             return END_OF_PROG;
     }

@@ -322,7 +322,7 @@ else if (strcmp(com[*tmp_com].command, #name) == 0)                             
         }                                                                                      \
         else                                                                                   \
         {                                                                                      \
-            bait.cmd = num;                                                                   \
+            bait.cmd = num;                                                                    \
             *((Cmd*)(array->mas + array->ip)) = bait;                                          \
             array->ip += 1;                                                                    \
         }                                                                                      \
@@ -348,7 +348,7 @@ int push_one_command (Commands* com, char_mas* array, int* tmp_com, int* tags)
 
     else
     {  
-        bait.cmd = THIS_IS_SMTH_NEW_INCORRECT_INPUT;    
+        bait.cmd = CODE_INCORRECT_INPUT;    
         *((Cmd*)(array->mas + array->ip)) = bait;
         array->ip += 1; // sizeof(bait)
     }

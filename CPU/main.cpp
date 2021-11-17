@@ -9,7 +9,7 @@ int main()
     system("C:/VSCprogs/Processor/asm/asm.exe");
     
     int corcheck = do_all_commands(input_file, &cpu);
-    if(corcheck == THIS_IS_SMTH_NEW_INCORRECT_INPUT)
+    if(corcheck == CODE_INCORRECT_INPUT)
         assert(ERROR && "INCORRECT INPUT? OK, CHECK YOUR <C> DRIVE");
     /*
     for (int i = 0 ; i < REG_CUNT; i++)
