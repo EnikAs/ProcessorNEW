@@ -13,10 +13,11 @@
 
 #include "C:/VSCprogs/Processor/cmd-enum.h"
 
+const int TAG_MAX_CUNT = 20;
 
 typedef int elem_t;
 
-enum end_of_file
+enum end_of_files
 {
     END_OF_FILE,
     NOT_END_OF_FILE,
@@ -53,6 +54,20 @@ struct buffer
     int tmp_pos = 0;
 };
 
+struct asm_tag
+{
+    int tag_value = 0;
+    int tag_hash = 0;
+};
+
+struct asm_tags
+{
+    asm_tag* tag;
+    int free = 0;
+};
+
+
+
 size_t       scanf_file_size            (FILE* file_stream);
 
 int          print_all_commands         (FILE* assembler_file, FILE* calc_file);
@@ -65,10 +80,14 @@ int          get_all_commands           (Commands* com, buffer* buf);
 
 int          get_one_command            (Commands* com, buffer* buf);
 
-int          push_one_command           (Commands* com, char_mas* array, int* tmp_com, int* tags);
+int          push_one_command           (Commands* com, char_mas* array, int* tmp_com, asm_tags* tag);
+
+int          tags_check                 (asm_tags* tags, int input_hash);
 
 int          init_cmd_bait              (int num, Commands* com, char_mas* array, int* tmp_com, double* tmp_int, char* tmp_reg, char* skobka, int* tags, Cmd* bait, int* tmp_tag);
 
 Commands*    commands_init              (buffer* buf);
+
+int          murmurHash                 (char * key, unsigned int len);
 
 #endif 

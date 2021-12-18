@@ -7,7 +7,7 @@ int main()
     FILE* input_file = fopen("C:/VSCprogs/Processor/assembler.jopa", "rb");
 
     system("C:/VSCprogs/Processor/asm/asm.exe");
-    
+
     int corcheck = do_all_commands(input_file, &cpu);
     if(corcheck == CODE_INCORRECT_INPUT)
         assert(ERROR && "INCORRECT INPUT? OK, CHECK YOUR <C> DRIVE");
@@ -22,7 +22,7 @@ int main()
         printf ("RAM[%d] = %d;\n", i, cpu.ram[i]);
     }
     */
-    //$StackDump(&cpu.stk);//НЕЛЬЗЯ ДРОПАТЬ ПРОГУ ПРИ ДАМПЕ 
+    //$StackDump(&cpu.stk);//НЕЛЬЗЯ ДРОПАТЬ ПРОГУ ПРИ ДАМПЕ
     //КВАДРАТКУ ФИКСИТЬ 
 
     return 0;

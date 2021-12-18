@@ -2,10 +2,10 @@
     POP ax ;R
     PUSH 0
     POP ex
-::1
+::one
     PUSH 0
     POP fx ;y
-::2
+::two
     PUSH fx
     PUSH 25
     SUB
@@ -25,7 +25,7 @@
     PUSH ax
     MUL
 
-    CALL :3
+    CALL :three
     
     PUSH 1
     PUSH fx ;x
@@ -33,7 +33,7 @@
     POP fx
     PUSH fx
     PUSH 50
-    JA :2
+    JA :two
 
     PUSH ex ;x
     PUSH 1
@@ -41,17 +41,17 @@
     POP ex
     PUSH ex
     PUSH 50
-    JA :1
+    JA :one
 
     VRAMPR
 
-::3
+::three
     POP bx ;trash
-    JA :4
+    JA :four
     PUSH bx
     RET
 
-::4
+::four
     PUSH ex
     PUSH fx
     VRAM

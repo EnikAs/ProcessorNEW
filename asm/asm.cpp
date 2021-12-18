@@ -7,7 +7,11 @@ int print_all_commands (FILE* assembler_file, FILE* calc_file)
 
     buffer* buf = (buffer*) calloc(1, sizeof(buffer));
     
-    int tags[10] = {}; // *ЭТО БЫЛО ГЛОБАЛКОЙ* плохо, но, наверное можно (нет не можно))
+    //int tags[10] = {}; // *ЭТО БЫЛО ГЛОБАЛКОЙ* плохо, но, наверное можно (нет не можно))
+
+    asm_tags tags = {};
+
+    tags.tag = (asm_tag*) calloc(TAG_MAX_CUNT, sizeof(asm_tag));
 
     char_mas array = {};
     
@@ -30,19 +34,20 @@ int print_all_commands (FILE* assembler_file, FILE* calc_file)
     
     for (tmp_com = 0 ; tmp_com < buf->tmp_string_cunt ; tmp_com++)
     {
-        push_one_command(com, &array, &tmp_com, tags);
+        push_one_command(com, &array, &tmp_com, &tags);
     }
     tmp_com = 0;
     array = {};
     for (tmp_com = 0 ; tmp_com < buf->tmp_string_cunt ; tmp_com++)
     {
-        push_one_command(com, &array, &tmp_com, tags);
+        push_one_command(com, &array, &tmp_com, &tags);
     }
     
     fwrite(array.mas, sizeof(char), array.ip , assembler_file); // +1 не нужно, так как ip сам увеличивается на эту "дополнительную" единицу 
     
     fclose(calc_file);
     fclose(assembler_file);
+    free(tags.tag);
     free(com);
     free(buf->buffer);
 
@@ -295,7 +300,7 @@ else if (strcmp(com[*tmp_com].command, #name) == 0)                             
             else if (sscanf(com[*tmp_com].command, "%cx", &tmp_reg) == 1 && isalpha(tmp_reg) != 0)  \
             {                                                                                  \
                 bait.reg = 1;                                                                  \
-                bait.cmd = num;                                                               \
+                bait.cmd = num;                                                                \
                 *((Cmd*)(array->mas + array->ip)) = bait;                                      \
                 array->ip += 1;                                                                \
                 *((char*)((char*)array->mas + array->ip)) = tmp_reg - 'a';                     \
@@ -304,19 +309,23 @@ else if (strcmp(com[*tmp_com].command, #name) == 0)                             
             else if(sscanf(com[*tmp_com].command, "%lf", &tmp_int) == 1)                       \
             {                                                                                  \
                 bait.konst = 1;                                                                \
-                bait.cmd = num;                                                               \
+                bait.cmd = num;                                                                \
                 *((Cmd*)(array->mas + array->ip)) = bait;                                      \
                 array->ip += 1;                                                                \
                 *((cpu_val*)(array->mas + array->ip)) = tmp_int;                               \
                 array->ip += sizeof(cpu_val);                                                  \
             }                                                                                  \
-            else if(sscanf(com[*tmp_com].command, ":%d", &tmp_tag) == 1)                       \
+            else if(sscanf(com[*tmp_com].command, ":%s", tag_name) == 1)                       \
             {                                                                                  \
                 bait.konst = 1;                                                                \
-                bait.cmd = num;                                                               \
+                bait.cmd = num;                                                                \
                 *((Cmd*)(array->mas + array->ip)) = bait;                                      \
                 array->ip += 1;                                                                \
-                *((cpu_val*)(array->mas + array->ip)) = tags[tmp_tag];                         \
+                tmp_hash = murmurHash(tag_name, strlen(tag_name));                             \
+                tmp_tag_num = tags_check(tags, tmp_hash);                                      \
+                if (tmp_tag_num >= 0)                                                          \
+                    *((cpu_val*)(array->mas + array->ip)) = tags->tag[tmp_tag_num].tag_value;  \
+                                                                                               \
                 array->ip += sizeof(cpu_val);                                                  \
             }                                                                                  \
         }                                                                                      \
@@ -328,20 +337,29 @@ else if (strcmp(com[*tmp_com].command, #name) == 0)                             
         }                                                                                      \
     }                                                                                          \
 
-int push_one_command (Commands* com, char_mas* array, int* tmp_com, int* tags)
+int push_one_command (Commands* com, char_mas* array, int* tmp_com, asm_tags* tags)
 {
     Cmd bait = {};
     double tmp_int = 0; 
-    int tmp_tag = -1;
     char tmp_reg = 0;
     char skobka = 0;
+    int tmp_tag_num = 0;
+    int tmp_hash = 0;
+    char tag_name[1000] = {};
+
     if (strlen(com[*tmp_com].command) == 0)
         return 0;
 
-    else if (sscanf(com[*tmp_com].command, "::%d", &tmp_tag ) == 1)
+    else if (sscanf(com[*tmp_com].command, "::%s", tag_name) == 1)
     {
-        if (tags[tmp_tag] == 0)
-            tags[tmp_tag] = array->ip;
+        tmp_hash = murmurHash(tag_name, strlen(tag_name));
+        tmp_tag_num = tags_check(tags, tmp_hash);
+        if (tmp_tag_num == -1)
+        {
+            tags->tag[tags->free].tag_hash = tmp_hash;
+            tags->tag[tags->free].tag_value = array->ip;
+            tags->free += 1;
+        }
     }
 
     #include "C:/VSCprogs/Processor/define.define"
@@ -353,6 +371,17 @@ int push_one_command (Commands* com, char_mas* array, int* tmp_com, int* tags)
         array->ip += 1; // sizeof(bait)
     }
     return 0;
+}
+
+int tags_check (asm_tags* tags, int input_hash)
+{
+    for(int i = 0 ; i < TAG_MAX_CUNT ; i++)
+    {
+        if (tags->tag[i].tag_hash == input_hash)
+            return i;
+    }
+
+    return -1;
 }
 /*
     else if (strcmp(com[*tmp_com].command, "PUSH") == 0)
@@ -549,3 +578,60 @@ int push_one_command (Commands* com, char_mas* array, int* tmp_com, int* tags)
         array->ip += 1; // sizeof(bait)
     }
     */
+
+int murmurHash (char * key, unsigned int len)
+{
+  const unsigned int m = 0x5bd1e995;
+  const unsigned int seed = 0;
+  const int r = 24;
+
+  unsigned int h = seed ^ len;
+
+  const unsigned char * data = (const unsigned char *)key;
+  unsigned int k;
+
+  while (len >= 4)
+  {
+      k  = data[0];
+      k |= data[1] << 8;
+      k |= data[2] << 16;
+      k |= data[3] << 24;
+
+      k *= m;
+      k ^= k >> r;
+      k *= m;
+
+      h *= m;
+      h ^= k;
+
+      data += 4;
+      len -= 4;
+  }
+
+  switch (len)
+  {
+    case 3:
+      h ^= data[2] << 16;
+    case 2:
+      h ^= data[1] << 8;
+    case 1:
+      h ^= data[0];
+      h *= m;
+  };
+
+  h ^= h >> 13;
+  h *= m;
+  h ^= h >> 15;
+
+  return h;
+}
+/*
+3 1111412596
+2 1228156847
+1 772897149
+4 -637365278
+3 1111412596
+2 1228156847
+1 772897149
+4 -637365278
+*/

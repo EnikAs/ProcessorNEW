@@ -1,0 +1,121 @@
+IN ;a
+IN ;b
+IN ;c 
+POP cx
+POP bx
+POP ax
+PUSH ax
+PUSH 0
+JE :asdasd
+
+CALL :asdfgdf
+PUSH dx ;in_dx_now_discr
+PUSH dx
+PUSH 0
+JE :3
+PUSH dx
+PUSH 0
+JB :2
+PUSH dx
+PUSH 0
+JA :4
+HLT
+::1 ;calc_discriminant
+    POP ex ;start_adress
+    PUSH bx
+    PUSH bx
+    MUL
+    PUSH 4
+    PUSH ax
+    MUL
+    PUSH cx
+    MUL
+    SUB
+    POP dx
+    PUSH ex
+    RET
+::2 ;discr_>_0
+    POP ex
+    PUSH -1
+    PUSH bx
+    MUL
+    PUSH dx
+    SQRT
+    ADD
+    PUSH ax
+    PUSH 2
+    MUL
+    DIV
+    PRCH ;1_root
+    PUSH -1
+    PUSH bx
+    MUL
+    PUSH dx
+    SQRT
+    PUSH -1
+    MUL
+    ADD
+    PUSH ax
+    PUSH 2
+    MUL
+    DIV
+    PRCH ;2_root
+    PUSH ex
+    HLT
+::3 ;discr_==_0
+    PUSH bx
+    PUSH 0
+    JE :8
+    POP ex
+    PUSH -1
+    PUSH bx
+    MUL
+    PUSH 2
+    PUSH ax
+    MUL
+    DIV
+    PRCH
+    PUSH ex
+    HLT
+::4 ;discr_<_0
+    PUSH 8
+    PUSH 8
+    PUSH 14
+    PRCH
+    PRCH
+    PRCH
+    HLT
+::5 ;a_==_0
+    PUSH cx
+    PUSH 0
+    JE :6
+    PUSH bx
+    PUSH 0
+    JE :4
+    PUSH bx
+    PUSH cx
+    PUSH -1
+    MUL
+    DIV
+    PRCH
+    HLT
+::6 ;x_=_0
+    PUSH bx
+    PUSH 0
+    JE :7
+    PUSH 0
+    PRCH
+    HLT
+::7 ;a==0_b==0
+    PUSH 8
+    PUSH 2
+    PUSH 2
+    PRCH
+    PRCH
+    PRCH
+    HLT
+::8 ;d==0_b==0
+    PUSH 0
+    PRCH
+    HLT
+
